@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Feuille de route — Tournées de signification</title>
+<meta name="theme-color" content="#1c2340">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <div class="kicker">Signification d'actes · feuille de route</div>
+  <h1>Optimiseur de tournée</h1>
+  <div class="mode" id="modeBadge"><span class="pip"></span><span id="modeTxt">Mode gratuit (OpenStreetMap)</span></div>
+</header>
+
+<main>
+
+  <!-- Réglages -->
+  <details class="settings" id="settingsBox">
+    <summary>Réglages &amp; clés API</summary>
+    <div class="keybox">
+      <label for="gKey">Clé Google Maps <span class="opt">(optionnelle)</span></label>
+      <input type="password" id="gKey" placeholder="AIza..." autocomplete="off">
+
+      <div class="row" style="margin-top:12px">
+        <button class="btn-ink" id="btnSaveKey">Enregistrer</button>
+        <button class="btn-quiet" id="btnDelKey" style="flex:0 0 auto">Retirer</button>
+      </div>
+      <div class="keystate" id="keyState"></div>
+      <p><b>Sans clé</b>, l'appli est complète et gratuite : localisation par OpenStreetMap, optimisation de l'ordre, et lancement du GPS Google Maps.</p>
+      <p><b>Avec la clé</b> : ordre calculé par Google Maps sur les routes réelles, carte intégrée, kilométrage et durées exacts.</p>
+      <p>La clé reste enregistrée uniquement dans ton téléphone.</p>
+    </div>
+  </details>
+
+  <!-- Départ -->
+  <section class="card">
+    <h2>Point de départ</h2>
+    <div class="sub">Chaque adresse est mémorisée : tu choisis d'où tu pars à chaque tournée.</div>
+    <div class="presets" role="tablist" aria-label="Choix du point de départ">
+      <button type="button" class="preset" data-preset="etude">🏛 Étude <span class="tick">✓</span></button>
+      <button type="button" class="preset" data-preset="domicile">🏠 Domicile <span class="tick">✓</span></button>
+      <button type="button" class="preset" data-preset="autre">📍 Autre <span class="tick">✓</span></button>
+    </div>
+    <input type="text" id="startAddr" placeholder="ex. 12 avenue …, 68100 Mulhouse">
+    <div class="chk">
+      <input type="checkbox" id="roundTrip" checked>
+      <label for="roundTrip" style="margin:0;font-weight:500">Retour au point de départ en fin de tournée</label>
+    </div>
+  </section>
+
+  <!-- Ajout -->
+  <section class="card">
+    <h2>Adresses à signifier</h2>
+    <div class="sub">Saisis ou colle les adresses, une par ligne.</div>
+    <textarea id="addrInput" placeholder="4 rue des Fleurs, 68000 Colmar&#10;18 Grand'Rue, 68170 Rixheim"></textarea>
+    <button class="btn-ink" id="btnAdd" style="margin-top:10px;width:100%">+ Ajouter à la tournée</button>
+  </section>
+
+  <!-- Liste -->
+  <section class="card">
+    <h2>Tournée en préparation <span class="counter">(<span id="count">0</span>)</span></h2>
+    <div class="sub">L'ordre ci-dessous n'a pas d'importance : il sera recalculé.</div>
+    <div id="stopList"><div class="empty">Aucune adresse pour le moment.</div></div>
+    <button class="btn-quiet" id="btnClear" style="margin-top:8px">Vider la liste</button>
+  </section>
+
+  <!-- GO -->
+  <button class="btn-go" id="btnOptimize">Générer la tournée optimisée</button>
+  <div class="status" id="optStatus"></div>
+
+  <!-- Résultat -->
+  <section class="card accent-go hidden" id="resultCard" style="margin-top:16px">
+    <h2>Feuille de route</h2>
+    <div class="sub" id="resultSub">Ordre de passage optimisé</div>
+    <div class="totals">
+      <div class="t"><div class="v" id="totKm">–</div><div class="l">Kilomètres</div></div>
+      <div class="t" id="durBox"><div class="v" id="totDur">–</div><div class="l">Durée route</div></div>
+      <div class="t"><div class="v" id="totStops">–</div><div class="l">Arrêts</div></div>
+    </div>
+    <div id="map"></div>
+    <div class="manifest" id="manifest"></div>
+    <div id="mapsButtons"></div>
+    <p class="note" id="resultNote"></p>
+  </section>
+
+</main>
+<script src="js/app.js"></script>
+</body>
+</html>
