@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Étude — Tournées &amp; Significations</title>
+<meta name="theme-color" content="#0b0e17">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Terrain">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══ TERRAIN — design minimaliste ═══ */
+:root{
+  --bg:#f6f7f9; --card:#ffffff; --line:#e9ebf1; --line2:#dfe2ea;
+  --txt:#101319; --muted:#8b90a0; --ink:#101319; --ink-2:#1c202b;
+  --neon:#10e3a5; --neon2:#22c8ff; --neon-deep:#0bb582;
+  --seal:#e2334b; --seal-soft:#fdeef1;
+  --go:#0bb582; --go-soft:#e9faf3;
+  --gold-soft:#f4f1e6;
+  --r:18px;
+  --sh:0 1px 2px rgba(16,19,25,.04),0 8px 24px rgba(16,19,25,.06);
+  --spring:cubic-bezier(.34,1.4,.4,1);
+  --display:'Space Grotesk',system-ui,sans-serif;
+  --sans:'Manrope',-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--txt);font-size:16px;line-height:1.5;min-height:100vh;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
+
+/* ═══ SPLASH DE BIENVENUE ═══ */
+.splash{position:fixed;inset:0;z-index:200;background:#0a0d16;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:opacity .55s ease,visibility .55s}
+.splash.done{opacity:0;visibility:hidden;pointer-events:none}
+.neonRoute{width:min(78vw,340px);filter:drop-shadow(0 0 7px rgba(16,227,165,.8)) drop-shadow(0 0 26px rgba(16,227,165,.35))}
+.np{stroke:url(#ng);stroke-width:2.8;fill:none;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100;animation:npdraw 1.5s .25s cubic-bezier(.65,0,.35,1) forwards}
+@keyframes npdraw{to{stroke-dashoffset:0}}
+.nd{fill:#0a0d16;stroke:var(--neon);stroke-width:2;opacity:0;animation:ndpop .4s var(--spring) forwards}
+.nd.d2{animation-delay:.9s}.nd.d1{animation-delay:.45s}.nd.d3{animation-delay:1.55s;stroke:var(--neon2)}
+@keyframes ndpop{from{opacity:0;transform:scale(.3);transform-origin:center;transform-box:fill-box}to{opacity:1;transform:scale(1)}}
+.splashName{font-family:var(--display);font-weight:700;font-size:1.7rem;letter-spacing:.34em;color:#fff;margin-top:26px;opacity:0;animation:srise .6s 1.4s var(--spring) forwards;text-indent:.34em}
+.splashSub{font-size:.72rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#5d6478;opacity:0;animation:srise .6s 1.6s var(--spring) forwards}
+.splashSkip{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 26px);color:#454c5f;font-size:.72rem;letter-spacing:.06em;opacity:0;animation:srise .5s 2s ease forwards}
+@keyframes srise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.np{animation-duration:.01s}.nd,.splashName,.splashSub,.splashSkip{animation-duration:.01s;animation-delay:0s}}
+
+/* ═══ EN-TÊTE MINIMAL ═══ */
+.appbar{background:#0b0e17;color:#fff;padding:calc(env(safe-area-inset-top,0px) + 16px) 20px 16px;border-radius:0 0 22px 22px;position:relative}
+.appbar .top{display:flex;align-items:center;gap:12px}
+.appbar h1{font-family:var(--display);font-weight:700;font-size:1.18rem;letter-spacing:.01em}
+.appbar h1 .dot{color:var(--neon)}
+.appbar .tag{font-size:.66rem;color:#767d92;font-weight:600;margin-top:1px;letter-spacing:.1em;text-transform:uppercase}
+.gearBtn{margin-left:auto;width:38px;height:38px;border-radius:12px;border:1px solid #262c3c;background:#141826;color:#c6cad8;font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .25s var(--spring),background .15s}
+.gearBtn:active{transform:scale(.9) rotate(30deg)}
+.mode{display:inline-flex;align-items:center;gap:7px;margin-top:12px;font-size:.66rem;font-weight:700;letter-spacing:.05em;padding:5px 12px;border-radius:999px;background:#141826;border:1px solid #262c3c;color:#9aa1b5}
+.mode .pip{width:7px;height:7px;border-radius:50%;background:#4a5166;transition:all .3s}
+.mode.live{border-color:rgba(16,227,165,.35);color:#c8f5e6}
+.mode.live .pip{background:var(--neon);box-shadow:0 0 9px var(--neon)}
+
+main{max-width:560px;margin:0 auto;padding:16px 16px calc(env(safe-area-inset-bottom,0px) + 170px)}
+.view{display:none}
+.view.on{display:block}
+.view.on .card{animation:rise .5s var(--spring) both}
+.view.on .card:nth-of-type(2){animation-delay:.06s}
+.view.on .card:nth-of-type(3){animation-delay:.12s}
+.view.on .card:nth-of-type(4){animation-delay:.18s}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.view.on .card{animation:none}}
+
+/* ═══ CARTES ═══ */
+.card{background:var(--card);border-radius:var(--r);padding:18px;margin-bottom:12px;box-shadow:var(--sh);border:1px solid var(--line)}
+.cardHead{display:flex;align-items:center;gap:11px;margin-bottom:4px}
+.icn{width:36px;height:36px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.98rem;background:#f1f2f6;color:var(--txt);border:1px solid var(--line)}
+.icn.seal{background:var(--seal-soft);border-color:transparent}
+.icn.go{background:var(--go-soft);border-color:transparent}
+.icn.gold{background:var(--gold-soft);border-color:transparent}
+.cardHead h2{font-family:var(--display);font-weight:700;font-size:1.02rem;letter-spacing:.005em}
+.cardHead .n{font-family:var(--sans);font-size:.76rem;color:var(--muted);font-weight:700}
+.sub{font-size:.76rem;color:var(--muted);margin:2px 0 14px;padding-left:47px}
+
+/* ═══ CHAMPS ═══ */
+label{font-size:.73rem;font-weight:700;display:block;margin-bottom:6px;color:#565c6d;letter-spacing:.02em}
+input[type=text],input[type=password],input[type=number],input[type=datetime-local],input[type=date],textarea,select{
+  width:100%;padding:13px 14px;border:1.5px solid var(--line2);border-radius:13px;font-size:1rem;font-family:var(--sans);font-weight:500;background:#fbfbfd;color:var(--txt);transition:border-color .18s,box-shadow .18s,background .18s;appearance:none}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b90a0' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--txt);background:#fff;box-shadow:0 0 0 4px rgba(16,19,25,.06)}
+textarea{resize:vertical;min-height:72px;line-height:1.55}
+::placeholder{color:#b3b7c4}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid31{display:grid;grid-template-columns:86px 1fr;gap:10px}
+
+/* ═══ BOUTONS ═══ */
+button{border:none;border-radius:13px;padding:13px 15px;font-size:.9rem;font-weight:700;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.01em;transition:transform .3s var(--spring),background .15s,box-shadow .25s,opacity .15s}
+button:active{transform:scale(.96)}
+.btn-ink{background:var(--ink);color:#fff}
+.btn-ink:hover{background:var(--ink-2)}
+.btn-outline{background:#fff;color:var(--txt);border:1.5px solid var(--line2)}
+.btn-outline:hover{border-color:var(--txt)}
+.btn-nav{background:var(--ink);color:#fff;width:100%;padding:16px;font-weight:800;border-radius:14px;box-shadow:0 10px 24px -8px rgba(16,19,25,.4)}
+.btn-nav::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--neon);box-shadow:0 0 10px var(--neon)}
+.btn-maps{background:#fff;border:1.5px solid var(--line2);color:var(--txt);width:100%}
+.btn-quiet{background:transparent;color:var(--seal);font-size:.8rem;padding:9px;font-weight:700}
+button:disabled{opacity:.4;pointer-events:none}
+.chk{display:flex;align-items:center;gap:10px;font-size:.86rem;margin-top:10px;font-weight:600}
+.chk input{width:20px;height:20px;accent-color:var(--go);flex-shrink:0}
+
+/* segmented */
+.presets{display:flex;gap:4px;margin-bottom:10px;background:#eef0f4;border-radius:13px;padding:4px}
+.preset{flex:1;padding:10px 4px;border-radius:10px;cursor:pointer;border:none;background:transparent;color:var(--muted);font-size:.79rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .3s var(--spring)}
+.preset.active{background:#fff;color:var(--txt);box-shadow:0 2px 10px rgba(16,19,25,.1)}
+.preset .tick{display:none;font-size:.55rem;color:var(--go)}
+.preset.filled .tick{display:inline}
+
+/* arrêts */
+.stop{display:flex;align-items:center;gap:11px;background:#fbfbfd;border:1px solid var(--line);border-radius:14px;padding:11px 12px;margin-bottom:8px;animation:pop .35s var(--spring) both}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+.stop .dot{width:28px;height:28px;border-radius:10px;flex-shrink:0;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:.74rem;font-weight:700}
+.stop .addr{flex:1;font-size:.88rem;font-weight:600;word-break:break-word}
+.stop .act{width:32px;height:32px;flex-shrink:0;border-radius:10px;padding:0;font-size:.92rem}
+.stop .act.sig{background:#f1f2f6;color:var(--txt)}
+.stop .act.del{background:var(--seal-soft);color:var(--seal)}
+.empty{text-align:center;color:var(--muted);font-size:.84rem;font-weight:500;padding:24px 12px;border:1.5px dashed var(--line2);border-radius:14px;background:#fbfbfd}
+.empty .big{font-size:1.5rem;display:block;margin-bottom:6px;opacity:.5}
+
+/* trafic */
+.traffic{display:flex;gap:10px;align-items:flex-start;border-radius:13px;padding:12px 13px;font-size:.82rem;font-weight:600;margin-bottom:14px}
+.traffic.fluide{background:var(--go-soft);color:#0a6b4e}
+.traffic.charge{background:#fdf6e3;color:#8a6a10}
+.traffic.dense{background:var(--seal-soft);color:#a11f33}
+.traffic .ticn{font-size:1rem}
+
+/* manifeste */
+.totals{display:flex;gap:8px;margin:4px 0 16px}
+.totals .t{flex:1;background:#fbfbfd;border:1px solid var(--line);border-radius:13px;padding:12px 6px;text-align:center}
+.totals .t .v{font-family:var(--display);font-size:1.3rem;font-weight:700;color:var(--txt)}
+.totals .t .l{font-size:.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:.13em;margin-top:4px;font-weight:800}
+#map{width:100%;height:270px;border-radius:14px;border:1px solid var(--line);margin-bottom:14px;display:none;background:#eceef2}
+.manifest{position:relative;padding:2px 0}
+.leg{display:flex;gap:13px;position:relative;padding-bottom:17px}
+.leg::before{content:"";position:absolute;left:15px;top:36px;bottom:0;border-left:2px dashed #c9cdd8}
+.leg:last-child{padding-bottom:2px}
+.leg:last-child::before{display:none}
+.leg .num{width:32px;height:32px;border-radius:11px;flex-shrink:0;z-index:1;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:.86rem}
+.leg .num.terminus{background:#fff;color:var(--txt);border:1.5px solid var(--txt)}
+.leg .body{flex:1;padding-top:4px;min-width:0}
+.leg .body .a{font-weight:700;font-size:.9rem}
+.leg .body .d{font-size:.73rem;color:var(--muted);margin-top:2px;font-weight:500}
+.leg .body .d b{color:var(--go)}
+.seg-label{font-size:.68rem;font-weight:800;color:var(--muted);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.14em}
+
+/* significations */
+.sigItem{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:14px;margin-bottom:9px;cursor:pointer;box-shadow:var(--sh);transition:transform .3s var(--spring)}
+.sigItem:active{transform:scale(.98)}
+.sigItem .l1{display:flex;align-items:center;gap:8px}
+.sigItem .dos{font-family:var(--display);font-weight:700;font-size:.9rem}
+.sigItem .badge{margin-left:auto;font-size:.62rem;font-weight:800;padding:4px 10px;border-radius:99px;background:var(--go-soft);color:#0a6b4e;white-space:nowrap;letter-spacing:.03em}
+.sigItem .badge.b659{background:var(--seal-soft);color:#a11f33}
+.sigItem .l2{font-size:.82rem;color:#4c5262;margin-top:5px;font-weight:600}
+.sigItem .l3{font-size:.71rem;color:var(--muted);margin-top:4px;display:flex;gap:10px;font-weight:600}
+.optgrid{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+.optchip{padding:9px 13px;border-radius:99px;border:1.5px solid var(--line2);background:#fff;font-size:.79rem;font-weight:700;color:#4c5262;cursor:pointer;transition:all .25s var(--spring)}
+.optchip:active{transform:scale(.94)}
+.optchip.sel,.optchip.selGold{background:var(--ink);border-color:var(--ink);color:#fff}
+.optchip.selGold{box-shadow:0 0 0 2px rgba(16,227,165,.35)}
+.fgroup{margin-top:14px}
+.subbox{background:#f7f8fa;border:1px solid var(--line);border-radius:14px;padding:13px;margin-top:10px;animation:pop .3s var(--spring) both}
+.photos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.ph{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:1;border:1px solid var(--line);animation:pop .3s var(--spring) both}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph .x{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:8px;background:rgba(16,19,25,.72);color:#fff;font-size:.78rem;padding:0}
+.addph{aspect-ratio:1;border:1.5px dashed var(--line2);border-radius:12px;background:#fbfbfd;color:var(--muted);font-size:1.3rem;display:flex;align-items:center;justify-content:center;cursor:pointer}
+
+/* tabbar + micro */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;padding:8px 16px calc(env(safe-area-inset-bottom,0px) + 10px);background:linear-gradient(180deg,rgba(246,247,249,0),var(--bg) 30%)}
+.tabbar .bar{max-width:560px;margin:0 auto;background:#0b0e17;border-radius:22px;display:flex;align-items:center;padding:8px;box-shadow:0 14px 34px -10px rgba(11,14,23,.55);border:1px solid #1b2030}
+.tab{flex:1;background:transparent;color:#767d92;font-size:.7rem;font-weight:800;flex-direction:column;gap:3px;padding:9px 4px;border-radius:15px;transition:all .3s var(--spring)}
+.tab .ti{font-size:1.1rem}
+.tab.on{color:#fff;background:#181d2c}
+.micFab{width:60px;height:60px;border-radius:50%;flex-shrink:0;margin:0 8px;background:#10141f;color:var(--neon);font-size:1.4rem;padding:0;border:2px solid rgba(16,227,165,.55);box-shadow:0 0 18px rgba(16,227,165,.35),0 10px 22px -6px rgba(11,14,23,.6);position:relative;top:-16px;transition:transform .3s var(--spring),box-shadow .3s}
+.micFab:active{transform:scale(.9);box-shadow:0 0 28px rgba(16,227,165,.6)}
+
+/* CTA */
+.genwrap{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 86px);z-index:39;padding:0 16px;pointer-events:none}
+.genwrap .inner{max-width:560px;margin:0 auto;pointer-events:auto}
+.btn-go{background:var(--ink);color:#fff;width:100%;padding:17px;font-size:.94rem;font-weight:800;border-radius:16px;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 12px 28px -8px rgba(16,19,25,.5)}
+.btn-go::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--neon);box-shadow:0 0 12px var(--neon);animation:neonpulse 1.8s ease-in-out infinite}
+@keyframes neonpulse{50%{box-shadow:0 0 3px var(--neon)}}
+
+/* feuilles */
+.veil{position:fixed;inset:0;background:rgba(11,14,23,.5);backdrop-filter:blur(3px);z-index:60;opacity:0;pointer-events:none;transition:opacity .3s}
+.veil.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;background:#fff;border-radius:26px 26px 0 0;padding:10px 20px calc(env(safe-area-inset-bottom,0px) + 22px);transform:translateY(105%);transition:transform .45s var(--spring);box-shadow:0 -16px 50px rgba(11,14,23,.28);max-width:600px;margin:0 auto;max-height:88vh;overflow-y:auto}
+.sheet.open{transform:none}
+.grip{width:40px;height:5px;border-radius:99px;background:#e3e5ec;margin:6px auto 14px}
+.sheet h3{font-family:var(--display);font-weight:700;font-size:1.12rem;margin-bottom:12px}
+.sheet p{font-size:.77rem;color:var(--muted);margin:9px 0;line-height:1.6;font-weight:500}
+.keystate{font-size:.79rem;font-weight:800;margin-top:10px}
+.keystate.ok{color:var(--go)} .keystate.ko{color:var(--seal)}
+
+/* orbe vocale */
+.voiceOverlay{position:fixed;inset:0;z-index:80;background:rgba(10,13,22,.78);backdrop-filter:blur(6px);display:none;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 44px)}
+.voiceOverlay.on{display:flex}
+.vTxt{color:#fff;font-size:.95rem;font-weight:700;text-align:center;padding:0 30px;margin-bottom:8px;min-height:24px}
+.vHint{color:#8b91a5;font-size:.75rem;font-weight:500;text-align:center;padding:0 34px;margin-bottom:26px;line-height:1.55}
+.orbWrap{position:relative;width:116px;height:116px;margin-bottom:22px}
+.orb{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 32% 28%,#8ffbda,var(--neon) 45%,#065c42);box-shadow:0 0 40px rgba(16,227,165,.6),0 0 90px rgba(16,227,165,.25);transition:transform .07s linear}
+.orb::after{content:"";position:absolute;inset:-12px;border-radius:50%;border:2px solid rgba(16,227,165,.4);animation:orbring 1.8s ease-out infinite}
+@keyframes orbring{0%{transform:scale(.8);opacity:.9}100%{transform:scale(1.4);opacity:0}}
+.vStop{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:99px;padding:11px 28px;font-weight:800}
+
+.status{font-size:.83rem;padding:12px 14px;border-radius:13px;margin-top:12px;display:none;font-weight:600}
+.status.info{display:flex;align-items:center;gap:9px;background:var(--go-soft);color:#0a6b4e}
+.status.err{display:block;background:var(--seal-soft);color:#a11f33}
+.spinner{width:15px;height:15px;flex-shrink:0;border:2.5px solid rgba(11,181,130,.25);border-top-color:var(--go);border-radius:50%;animation:spin .8s linear infinite}
+.btn-go .spinner{border-color:rgba(255,255,255,.3);border-top-color:#fff}
+@keyframes spin{to{transform:rotate(360deg)}}
+.note{font-size:.71rem;color:var(--muted);margin-top:12px;line-height:1.6;font-weight:500}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- ═══ ANIMATION DE BIENVENUE ═══ -->
+<div class="splash" id="splash">
+  <svg class="neonRoute" viewBox="0 0 320 190" aria-hidden="true">
+    <defs>
+      <linearGradient id="ng" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#10e3a5"/><stop offset="1" stop-color="#22c8ff"/>
+      </linearGradient>
+    </defs>
+    <path class="np" pathLength="100" d="M16 148 C74 52,126 176,168 92 S 262 22,304 66"/>
+    <circle class="nd" cx="16" cy="148" r="5"/>
+    <circle class="nd d1" cx="168" cy="92" r="5"/>
+    <circle class="nd d3" cx="304" cy="66" r="5"/>
+  </svg>
+  <div class="splashName">TERRAIN</div>
+  <div class="splashSub">Tournées &amp; significations</div>
+  <div class="splashSkip">toucher pour continuer</div>
+</div>
+
+<!-- ═══ EN-TÊTE ═══ -->
+<div class="appbar">
+  <div class="top">
+    <div>
+      <h1>Terrain<span class="dot">.</span></h1>
+      <div class="tag">Tournées &amp; significations</div>
+    </div>
+    <button class="gearBtn" id="btnGear" aria-label="Réglages">⚙</button>
+  </div>
+  <div class="mode" id="modeBadge"><span class="pip"></span><span id="modeTxt">Mode gratuit</span></div>
+</div>
+
+<main>
+<!-- ════════════ VUE 1 : TOURNÉE ════════════ -->
+<div class="view on" id="viewTournee">
+
+  <section class="card">
+    <div class="cardHead"><div class="icn ink">🚗</div><h2>Départ &amp; arrivée</h2></div>
+    <div class="sub">Adresses mémorisées — un appui pour changer.</div>
+    <label>Point de départ</label>
+    <div class="presets">
+      <button type="button" class="preset pDep" data-preset="etude">Étude <span class="tick">●</span></button>
+      <button type="button" class="preset pDep" data-preset="domicile">Domicile <span class="tick">●</span></button>
+      <button type="button" class="preset pDep" data-preset="autre">Autre <span class="tick">●</span></button>
+    </div>
+    <input type="text" id="startAddr" placeholder="Adresse de départ">
+    <div class="fgroup">
+      <label>Point d'arrivée</label>
+      <div class="presets">
+        <button type="button" class="preset pArr active" data-arr="retour">↩ Départ</button>
+        <button type="button" class="preset pArr" data-arr="etude">Étude</button>
+        <button type="button" class="preset pArr" data-arr="domicile">Domicile</button>
+        <button type="button" class="preset pArr" data-arr="autre">Autre</button>
+      </div>
+      <input type="text" id="endAddr" class="hidden" placeholder="Adresse d'arrivée">
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="cardHead"><div class="icn seal">✉</div><h2>Adresses à signifier</h2></div>
+    <div class="sub">Ajout guidé, ou dictée avec le micro 🎙 en bas.</div>
+    <button class="btn-ink" id="btnOpenAddr" style="width:100%">+ Ajouter une adresse</button>
+  </section>
+
+  <section class="card">
+    <div class="cardHead"><div class="icn go">📋</div><h2>Tournée <span class="n">· <span id="count">0</span> arrêt(s)</span></h2></div>
+    <div class="sub">L'ordre sera recalculé. ✍ = préparer la signification.</div>
+    <div id="stopList"><div class="empty"><span class="big">🗂</span>Aucune adresse pour le moment.</div></div>
+    <button class="btn-quiet" id="btnClear" style="margin-top:4px">Vider la liste</button>
+  </section>
+
+  <section class="card hidden" id="resultCard" style="border-top:4px solid var(--go)">
+    <div class="cardHead"><div class="icn go">🧭</div><h2>Feuille de route</h2></div>
+    <div class="sub" id="resultSub">Ordre de passage optimisé</div>
+    <div class="traffic hidden" id="trafficBox"><span class="ticn" id="trafficIcn">🚦</span><span id="trafficTxt"></span></div>
+    <div class="totals">
+      <div class="t"><div class="v" id="totKm">–</div><div class="l">Kilomètres</div></div>
+      <div class="t" id="durBox"><div class="v" id="totDur">–</div><div class="l">Durée route</div></div>
+      <div class="t"><div class="v" id="totStops">–</div><div class="l">Arrêts</div></div>
+    </div>
+    <div id="map"></div>
+    <div class="manifest" id="manifest"></div>
+    <div id="mapsButtons"></div>
+    <p class="note" id="resultNote"></p>
+  </section>
+</div>
+
+<!-- ════════════ VUE 2 : SIGNIFICATIONS ════════════ -->
+<div class="view" id="viewSignif">
+  <section class="card">
+    <div class="cardHead"><div class="icn gold">⚖</div><h2>Significations <span class="n">· <span id="sigCount">0</span></h2></div>
+    <div class="sub">Modalités conformes au Code de procédure civile.</div>
+    <button class="btn-ink" id="btnNewSig" style="width:100%">+ Nouvelle signification</button>
+  </section>
+  <div id="sigList"><div class="empty"><span class="big">⚖</span>Aucune signification enregistrée.</div></div>
+</div>
+</main>
+
+<!-- CTA générer (vue tournée) -->
+<div class="genwrap" id="genwrap"><div class="inner">
+  <button class="btn-go" id="btnOptimize">⚡ Générer la tournée optimisée</button>
+  <div class="status" id="optStatus"></div>
+</div></div>
+
+<!-- ═══ BARRE ONGLETS + MICRO ═══ -->
+<div class="tabbar"><div class="bar">
+  <button class="tab on" id="tabTournee"><span class="ti">🧭</span>Tournée</button>
+  <button class="micFab" id="btnMic" aria-label="Commande vocale">🎙</button>
+  <button class="tab" id="tabSignif"><span class="ti">⚖</span>Significations</button>
+</div></div>
+
+<!-- ═══ MODALE ADRESSE ═══ -->
+<div class="veil" id="veilAddr"></div>
+<div class="sheet" id="sheetAddr">
+  <div class="grip"></div>
+  <h3>Nouvelle adresse</h3>
+  <div class="grid31">
+    <div><label>N°</label><input type="text" id="aNum" inputmode="numeric" placeholder="12"></div>
+    <div><label>Voie (rue, impasse, avenue…)</label><input type="text" id="aVoie" placeholder="rue des Fleurs"></div>
+  </div>
+  <div class="grid31" style="margin-top:10px">
+    <div><label>Code postal</label><input type="text" id="aCP" inputmode="numeric" placeholder="68000"></div>
+    <div><label>Ville</label><input type="text" id="aVille" placeholder="Colmar"></div>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:16px">
+    <button class="btn-outline" id="btnAddrCancel" style="flex:1">Annuler</button>
+    <button class="btn-ink" id="btnAddrOk" style="flex:2">Valider l'adresse</button>
+  </div>
+</div>
+
+<!-- ═══ FICHE SIGNIFICATION ═══ -->
+<div class="veil" id="veilSig"></div>
+<div class="sheet" id="sheetSig">
+  <div class="grip"></div>
+  <h3 id="sigTitle">Nouvelle signification</h3>
+
+  <div class="grid2">
+    <div><label>N° de dossier</label><input type="text" id="sDossier" placeholder="2026-0421"></div>
+    <div><label>Date &amp; heure</label><input type="datetime-local" id="sDate"></div>
+  </div>
+  <div class="grid2" style="margin-top:10px">
+    <div><label>Nom</label><input type="text" id="sNom"></div>
+    <div><label>Prénom</label><input type="text" id="sPrenom"></div>
+  </div>
+  <div class="fgroup"><label>Adresse</label><input type="text" id="sAdresse" placeholder="12 rue …, 68000 Colmar"></div>
+
+  <div class="fgroup"><label>Constaté sur place</label>
+    <div class="optgrid" id="vuGrid"></div>
+    <input type="text" id="sVuAutre" class="hidden" placeholder="Préciser…" style="margin-top:8px">
+  </div>
+
+  <div class="fgroup"><label>Modalité de signification</label>
+    <div class="optgrid" id="modGrid"></div>
+
+    <div class="subbox hidden" id="boxPM">
+      <label>Acte remis à</label>
+      <div class="optgrid" id="pmGrid"></div>
+    </div>
+
+    <div class="subbox hidden" id="boxDom">
+      <div class="grid2">
+        <div><label>Identité du récipiendaire</label><input type="text" id="sDomIdent" placeholder="Nom, prénom"></div>
+        <div><label>Qualité</label><select id="sDomQual">
+          <option value="">—</option><option>Père</option><option>Mère</option><option>Fils</option><option>Fille</option>
+          <option>Conjoint(e)</option><option>Concubin(e)</option><option>Employé(e)</option><option>Gardien</option><option>Autre</option>
+        </select></div>
+      </div>
+      <input type="text" id="sDomQualAutre" class="hidden" placeholder="Préciser la qualité…" style="margin-top:8px">
+    </div>
+
+    <div class="subbox hidden" id="boxDepot">
+      <label>Éléments caractérisant le dépôt étude</label>
+      <div class="optgrid" id="depGrid"></div>
+      <input type="text" id="sDepotManuel" placeholder="Autre élément (saisie libre)…" style="margin-top:9px">
+    </div>
+
+    <div class="subbox hidden" id="box659">
+      <label>Remarques pour la rédaction du PV 659</label>
+      <textarea id="sRem659" placeholder="Diligences accomplies, constatations, personnes interrogées…"></textarea>
+    </div>
+  </div>
+
+  <div class="fgroup grid2">
+    <div><label>Feuillets de l'acte</label><input type="number" id="sFActe" min="0" inputmode="numeric"></div>
+    <div><label>Feuillets de la copie</label><input type="number" id="sFCopie" min="0" inputmode="numeric"></div>
+  </div>
+
+  <div class="fgroup">
+    <div class="chk"><input type="checkbox" id="sEncOn"><label for="sEncOn" style="margin:0">Encaissement reçu sur place</label></div>
+    <div class="subbox hidden" id="boxEnc">
+      <div class="grid2">
+        <div><label>Montant (€)</label><input type="number" id="sEncMontant" step="0.01" inputmode="decimal"></div>
+        <div><label>Mode de paiement</label><select id="sEncMode">
+          <option>Espèces</option><option>Carte bancaire</option><option>Chèque</option><option>Virement</option>
+        </select></div>
+      </div>
+    </div>
+    <div class="chk"><input type="checkbox" id="sEchOn"><label for="sEchOn" style="margin:0">Échéancier convenu</label></div>
+    <div class="subbox hidden" id="boxEch">
+      <div class="grid2">
+        <div><label>Fréquence</label><select id="sEchFreq">
+          <option>Hebdomadaire</option><option>Bimensuelle</option><option>Mensuelle</option><option>Autre</option>
+        </select></div>
+        <div><label>Montant par échéance (€)</label><input type="number" id="sEchMontant" step="0.01" inputmode="decimal"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fgroup"><label>Photos (constatations sur place)</label>
+    <div class="photos" id="phGrid"><button class="addph" id="btnAddPh">📷</button></div>
+    <input type="file" id="phInput" accept="image/*" capture="environment" class="hidden" multiple>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-top:18px">
+    <button class="btn-quiet" id="btnSigDelete" style="flex:0 0 auto">Supprimer</button>
+    <button class="btn-outline" id="btnSigCancel" style="flex:1">Fermer</button>
+    <button class="btn-ink" id="btnSigSave" style="flex:2">Enregistrer</button>
+  </div>
+  <div class="status" id="sigStatus"></div>
+</div>
+
+<!-- ═══ RÉGLAGES ═══ -->
+<div class="veil" id="veilSet"></div>
+<div class="sheet" id="sheetSet">
+  <div class="grip"></div>
+  <h3>Réglages</h3>
+  <label>Clé Google Maps <span style="font-weight:400;color:var(--muted)">(optionnelle)</span></label>
+  <input type="password" id="gKey" placeholder="AIza..." autocomplete="off">
+  <div style="display:flex;gap:10px;margin-top:12px">
+    <button class="btn-ink" id="btnSaveKey" style="flex:1">Enregistrer</button>
+    <button class="btn-quiet" id="btnDelKey">Retirer</button>
+  </div>
+  <div class="keystate" id="keyState"></div>
+  <p><b>Sans clé</b> : localisation OpenStreetMap, optimisation et lancement du GPS — gratuit. <b>Avec clé</b> : calcul Google sur routes réelles, carte, trafic en temps réel, durées exactes.</p>
+</div>
+
+<!-- ═══ ORBE VOCALE ═══ -->
+<div class="voiceOverlay" id="voiceOverlay">
+  <div class="vTxt" id="vTxt">Je vous écoute…</div>
+  <div class="vHint" id="vHint"></div>
+  <div class="orbWrap"><div class="orb" id="orb"></div></div>
+  <input type="text" id="vDictee" class="hidden" placeholder="🎤 Utilise le micro du clavier puis Entrée"
+         style="max-width:320px;width:88%;margin-bottom:16px;text-align:center;background:#fff">
+  <button class="vStop" id="vStop">Terminer</button>
+</div>
+
+<script>
+/* ═══════════════ ÉTAT & PERSISTANCE ═══════════════ */
+let stops=[], nextId=1, gKey='', gReady=false, mapObj=null, dirRenderer=null, trafficLayer=null;
+let startPresets={etude:'',domicile:'',autre:''}, activePreset='etude';
+let arrMode='retour', arrAutre='';
+let sigs=[], editingSigId=null, sigPhotos=[];
+const $=id=>document.getElementById(id);
+const esc=t=>{const d=document.createElement('div');d.textContent=t??'';return d.innerHTML};
+
+function saveState(){
+  try{
+    startPresets[activePreset]=$('startAddr').value;
+    if(arrMode==='autre') arrAutre=$('endAddr').value;
+    localStorage.setItem('etude-terrain-v1', JSON.stringify({stops,nextId,startPresets,activePreset,arrMode,arrAutre,gKey,sigs}));
+  }catch(e){console.error('save',e)}
+}
+function loadState(){
+  try{
+    const raw=localStorage.getItem('etude-terrain-v1');
+    if(raw){const s=JSON.parse(raw);
+      stops=s.stops||[]; nextId=s.nextId||1;
+      startPresets=s.startPresets||{etude:'',domicile:'',autre:''};
+      activePreset=s.activePreset||'etude';
+      arrMode=s.arrMode||'retour'; arrAutre=s.arrAutre||'';
+      gKey=s.gKey||''; sigs=s.sigs||[];
+      if(gKey)$('gKey').value=gKey;
+    }
+  }catch(e){}
+  renderPresets(); renderArr(); renderStops(); renderSigs();
+  if(gKey) tryLoadGoogle(); else setMode(false);
+}
+
+/* ═══════════════ ONGLETS ═══════════════ */
+function showView(v){
+  $('viewTournee').classList.toggle('on',v==='t');
+  $('viewSignif').classList.toggle('on',v==='s');
+  const act=$(v==='t'?'viewTournee':'viewSignif');
+  act.classList.remove('on'); void act.offsetWidth; act.classList.add('on');
+  $('tabTournee').classList.toggle('on',v==='t');
+  $('tabSignif').classList.toggle('on',v==='s');
+  $('genwrap').style.display = v==='t' ? '' : 'none';
+}
+$('tabTournee').onclick=()=>showView('t');
+$('tabSignif').onclick=()=>showView('s');
+
+/* ═══════════════ FEUILLES / MODALES ═══════════════ */
+function open2(sheet,veil){$(sheet).classList.add('open');$(veil).classList.add('open')}
+function close2(sheet,veil){$(sheet).classList.remove('open');$(veil).classList.remove('open')}
+$('btnGear').onclick=()=>open2('sheetSet','veilSet');
+$('veilSet').onclick=()=>close2('sheetSet','veilSet');
+$('veilAddr').onclick=()=>close2('sheetAddr','veilAddr');
+$('veilSig').onclick=()=>close2('sheetSig','veilSig');
+
+/* ═══════════════ MODE GOOGLE ═══════════════ */
+function setMode(live){
+  $('modeBadge').classList.toggle('live',live);
+  $('modeTxt').textContent=live?'Connecté à Google Maps':'Mode gratuit';
+  const ks=$('keyState');
+  if(gKey){ks.className='keystate '+(live?'ok':'ko');
+    ks.textContent=live?'✓ Clé active — calculs et trafic Google Maps':'✗ Clé enregistrée mais Google injoignable';}
+  else{ks.className='keystate';ks.textContent='';}
+}
+function tryLoadGoogle(){
+  if(gReady){setMode(true);return Promise.resolve(true)}
+  return new Promise(res=>{
+    window.__gmReady=()=>{gReady=true;setMode(true);res(true)};
+    const s=document.createElement('script');
+    s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(gKey)+'&language=fr&region=FR&loading=async&callback=__gmReady';
+    s.onerror=()=>{setMode(false);res(false)};
+    setTimeout(()=>{if(!gReady){setMode(false);res(false)}},6000);
+    document.head.appendChild(s);
+  });
+}
+$('btnSaveKey').onclick=async()=>{gKey=$('gKey').value.trim();saveState();
+  if(gKey){$('keyState').className='keystate';$('keyState').textContent='Vérification…';await tryLoadGoogle();}else setMode(false);};
+$('btnDelKey').onclick=()=>{gKey='';$('gKey').value='';gReady=false;setMode(false);saveState();};
+
+/* ═══════════════ DÉPART / ARRIVÉE ═══════════════ */
+const HINTS={etude:"Adresse de l'étude",domicile:"Adresse de ton domicile",autre:"Autre adresse de départ"};
+function renderPresets(){
+  document.querySelectorAll('.pDep').forEach(b=>{
+    const p=b.dataset.preset;
+    b.classList.toggle('active',p===activePreset);
+    b.classList.toggle('filled',!!startPresets[p]);
+  });
+  $('startAddr').value=startPresets[activePreset]||'';
+  $('startAddr').placeholder=HINTS[activePreset];
+}
+document.querySelectorAll('.pDep').forEach(b=>{b.onclick=()=>{
+  startPresets[activePreset]=$('startAddr').value;
+  activePreset=b.dataset.preset; renderPresets(); saveState();
+  if(!startPresets[activePreset])$('startAddr').focus();
+}});
+function renderArr(){
+  document.querySelectorAll('.pArr').forEach(b=>b.classList.toggle('active',b.dataset.arr===arrMode));
+  const e=$('endAddr');
+  if(arrMode==='autre'){e.classList.remove('hidden');e.value=arrAutre;}
+  else e.classList.add('hidden');
+}
+document.querySelectorAll('.pArr').forEach(b=>{b.onclick=()=>{
+  if(arrMode==='autre')arrAutre=$('endAddr').value;
+  arrMode=b.dataset.arr; renderArr(); saveState();
+}});
+function getEndAddr(startAddr){
+  if(arrMode==='retour')return startAddr;
+  if(arrMode==='autre')return $('endAddr').value.trim();
+  return (startPresets[arrMode]||'').trim();
+}
+
+/* ═══════════════ ADRESSES ═══════════════ */
+function renderStops(){
+  $('count').textContent=stops.length;
+  const l=$('stopList');
+  if(!stops.length){l.innerHTML='<div class="empty"><span class="big">🗂</span>Aucune adresse pour le moment.</div>';return}
+  l.innerHTML=stops.map((s,i)=>`
+    <div class="stop"><div class="dot">${i+1}</div><div class="addr">${esc(s.text)}</div>
+    <button class="act sig" data-sig="${s.id}" aria-label="Préparer la signification">✍</button>
+    <button class="act del" data-id="${s.id}" aria-label="Supprimer">✕</button></div>`).join('');
+  l.querySelectorAll('.del').forEach(b=>b.onclick=()=>{stops=stops.filter(s=>s.id!=b.dataset.id);renderStops();saveState()});
+  l.querySelectorAll('.sig').forEach(b=>b.onclick=()=>{
+    const st=stops.find(s=>s.id==b.dataset.sig);
+    openSigForm(null, st?st.text:'');
+  });
+}
+$('btnClear').onclick=()=>{if(stops.length&&confirm('Vider toutes les adresses ?')){stops=[];renderStops();saveState();$('resultCard').classList.add('hidden')}};
+
+/* modale adresse */
+$('btnOpenAddr').onclick=()=>{['aNum','aVoie','aCP','aVille'].forEach(i=>$(i).value='');open2('sheetAddr','veilAddr');setTimeout(()=>$('aNum').focus(),250)};
+$('btnAddrCancel').onclick=()=>close2('sheetAddr','veilAddr');
+$('btnAddrOk').onclick=()=>{
+  const num=$('aNum').value.trim(), voie=$('aVoie').value.trim(), cp=$('aCP').value.trim(), ville=$('aVille').value.trim();
+  if(!voie||!cp||!ville){alert('Voie, code postal et ville sont nécessaires.');return}
+  const text=(num?num+' ':'')+voie+', '+cp+' '+ville;
+  stops.push({id:nextId++,text}); renderStops(); saveState();
+  close2('sheetAddr','veilAddr');
+};
+
+/* ═══════════ OPTIMISATION — GOOGLE ═══════════ */
+function gRoute(req){return new Promise((res,rej)=>{new google.maps.DirectionsService().route(req,(r,st)=>st==='OK'?res(r):rej(new Error('Google Directions : '+st)))})}
+async function optimizeWithGoogle(startAddr,endAddr){
+  if(stops.length>25)throw new Error('25 étapes maximum par calcul — divise la tournée.');
+  const result=await gRoute({
+    origin:startAddr,destination:endAddr,
+    waypoints:stops.map(s=>({location:s.text,stopover:true})),
+    optimizeWaypoints:true,travelMode:google.maps.TravelMode.DRIVING,
+    drivingOptions:{departureTime:new Date(),trafficModel:'bestguess'}
+  });
+  const route=result.routes[0];
+  const orderedStops=route.waypoint_order.map(i=>stops[i].text);
+  let m=0,sec=0,secTraf=0;
+  route.legs.forEach(l=>{m+=l.distance.value;sec+=l.duration.value;secTraf+=(l.duration_in_traffic?l.duration_in_traffic.value:l.duration.value)});
+  const legInfos=route.legs.map(l=>({km:l.distance.value/1000,min:Math.round((l.duration_in_traffic||l.duration).value/60)}));
+  const navPoints=[route.legs[0].start_location,...route.legs.map(l=>l.end_location)].map(p=>({lat:p.lat(),lng:p.lng()}));
+  $('map').style.display='block';
+  if(!mapObj){
+    mapObj=new google.maps.Map($('map'),{disableDefaultUI:true,zoomControl:true});
+    dirRenderer=new google.maps.DirectionsRenderer({map:mapObj,polylineOptions:{strokeColor:'#0e7a5f',strokeWeight:5,strokeOpacity:.85}});
+    trafficLayer=new google.maps.TrafficLayer(); trafficLayer.setMap(mapObj);
+  }
+  dirRenderer.setDirections(result);
+  return {orderedStops,km:m/1000,durMin:Math.round(secTraf/60),normalMin:Math.round(sec/60),legInfos,navPoints,engine:'google'};
+}
+
+/* ═══════════ OPTIMISATION — GRATUIT ═══════════ */
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function nomGeocode(addr){
+  const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=fr&q='+encodeURIComponent(addr),{headers:{'Accept-Language':'fr'}});
+  if(!r.ok)throw new Error('service de localisation indisponible ('+r.status+')');
+  const j=await r.json();
+  if(!j.length)throw new Error('adresse introuvable : « '+addr+' »');
+  return {lat:parseFloat(j[0].lat),lng:parseFloat(j[0].lon)};
+}
+function hav(a,b){const R=6371,t=d=>d*Math.PI/180;const dLa=t(b.lat-a.lat),dLo=t(b.lng-a.lng);
+  const h=Math.sin(dLa/2)**2+Math.cos(t(a.lat))*Math.cos(t(b.lat))*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+/* chemin à extrémités fixes : points[0]=départ, points[n-1]=arrivée (peut être identique) */
+function solvePath(points, sameEnd){
+  const n=points.length;
+  const D=Array.from({length:n},(_,i)=>Array.from({length:n},(_,j)=>hav(points[i],points[j])));
+  const last=n-1, mids=[]; for(let i=1;i<last;i++)mids.push(i);
+  let order=[0]; const used=new Set();
+  while(order.length<mids.length+1){
+    const cur=order[order.length-1]; let best=-1,bd=1/0;
+    for(const j of mids) if(!used.has(j)&&D[cur][j]<bd){bd=D[cur][j];best=j}
+    order.push(best); used.add(best);
+  }
+  order.push(last);
+  const len=o=>{let t=0;for(let i=0;i<o.length-1;i++)t+=D[o[i]][o[i+1]];return t};
+  let imp=true,g=0;
+  while(imp&&g++<60){imp=false;
+    for(let i=1;i<order.length-2;i++)for(let k=i+1;k<order.length-1;k++){
+      const c=[...order.slice(0,i),...order.slice(i,k+1).reverse(),...order.slice(k+1)];
+      if(len(c)<len(order)-1e-6){order=c;imp=true}
+    }}
+  return {order,km:len(order)};
+}
+async function optimizeFree(startAddr,endAddr,st){
+  const same=endAddr===startAddr;
+  const addrs=[startAddr,...stops.map(s=>s.text)]; if(!same)addrs.push(endAddr);
+  const pts=[];
+  for(let i=0;i<addrs.length;i++){
+    st.innerHTML='<div class="spinner"></div> Localisation… '+(i+1)+' / '+addrs.length;
+    pts.push(await nomGeocode(addrs[i]));
+    if(i<addrs.length-1)await sleep(1100);
+  }
+  if(same)pts.push(pts[0]);
+  st.innerHTML='<div class="spinner"></div> Optimisation…'; await sleep(30);
+  const {order,km}=solvePath(pts,same);
+  const orderedStops=order.slice(1,-1).map(i=>stops[i-1].text);
+  const navPoints=order.map(i=>pts[i]);
+  return {orderedStops,km,durMin:null,normalMin:null,legInfos:null,navPoints,engine:'free'};
+}
+
+/* ═══════════ LIENS NAVIGATION (coordonnées GPS) ═══════════ */
+function buildMapsLinks(navPoints){
+  const c=p=>p.lat.toFixed(6)+','+p.lng.toFixed(6);
+  const links=[];let i=0;
+  while(i<navPoints.length-1){
+    const end=Math.min(i+10,navPoints.length-1);
+    let url='https://www.google.com/maps/dir/?api=1&origin='+c(navPoints[i])+'&destination='+c(navPoints[end])+'&travelmode=driving';
+    const w=navPoints.slice(i+1,end);
+    if(w.length)url+='&waypoints='+w.map(c).join('%7C');
+    links.push(url);i=end;
+  }
+  return links;
+}
+
+/* ═══════════ GÉNÉRER ═══════════ */
+$('btnOptimize').onclick=async()=>{
+  const st=$('optStatus');
+  const startAddr=$('startAddr').value.trim();
+  const endAddr=getEndAddr(startAddr);
+  if(!startAddr){st.className='status err';st.textContent='Indique le point de départ.';return}
+  if(!endAddr){st.className='status err';st.textContent="Renseigne l'adresse d'arrivée choisie.";return}
+  if(stops.length<2){st.className='status err';st.textContent='Ajoute au moins 2 adresses.';return}
+  const btn=$('btnOptimize'),old=btn.innerHTML;
+  btn.disabled=true;btn.innerHTML='<div class="spinner"></div> Calcul…';saveState();
+  try{
+    let res;
+    if(gKey&&(gReady||await tryLoadGoogle())){
+      st.className='status info';st.innerHTML='<div class="spinner"></div> Google Maps calcule (trafic inclus)…';
+      res=await optimizeWithGoogle(startAddr,endAddr);
+    }else{
+      st.className='status info';
+      res=await optimizeFree(startAddr,endAddr,st);
+      $('map').style.display='none';
+    }
+    renderResult(startAddr,endAddr,res); st.className='status';
+  }catch(e){st.className='status err';st.textContent='Erreur : '+e.message}
+  finally{btn.disabled=false;btn.innerHTML=old}
+};
+
+function renderResult(startAddr,endAddr,res){
+  const {orderedStops,km,durMin,normalMin,legInfos,navPoints,engine}=res;
+  $('resultCard').classList.remove('hidden');
+  $('totKm').textContent=(engine==='google'?km.toFixed(1):'≈ '+km.toFixed(1));
+  $('totStops').textContent=orderedStops.length;
+  if(durMin!=null){$('durBox').style.display='';
+    $('totDur').textContent=durMin>=60?Math.floor(durMin/60)+' h '+String(durMin%60).padStart(2,'0'):durMin+' min';}
+  else $('durBox').style.display='none';
+
+  /* trafic temps réel */
+  const tb=$('trafficBox');
+  if(engine==='google'&&durMin!=null&&normalMin!=null){
+    const delta=durMin-normalMin; tb.classList.remove('hidden','fluide','charge','dense');
+    if(delta<=3){tb.classList.add('fluide');$('trafficIcn').textContent='🟢';$('trafficTxt').textContent='Circulation fluide en ce moment — durée conforme à la normale.'}
+    else if(delta<=10){tb.classList.add('charge');$('trafficIcn').textContent='🟠';$('trafficTxt').textContent='Circulation chargée : environ +'+delta+' min par rapport à la normale.'}
+    else{tb.classList.add('dense');$('trafficIcn').textContent='🔴';$('trafficTxt').textContent='Trafic dense : environ +'+delta+' min. La carte affiche les axes encombrés en rouge.'}
+  }else tb.classList.add('hidden');
+
+  $('resultSub').textContent=engine==='google'?'Ordre calculé par Google Maps, trafic en temps réel':'Ordre optimisé (OpenStreetMap, vol d\'oiseau)';
+  const depLbl={etude:'Départ — étude',domicile:'Départ — domicile',autre:'Départ'}[activePreset]||'Départ';
+  const arrLbl=arrMode==='retour'?'Retour au point de départ':({etude:'Arrivée — étude',domicile:'Arrivée — domicile'}[arrMode]||'Arrivée');
+  let h=`<div class="leg"><div class="num terminus">D</div><div class="body"><div class="a">${esc(startAddr)}</div><div class="d">${depLbl}</div></div></div>`;
+  orderedStops.forEach((a,i)=>{
+    let d='Signification n°'+(i+1);
+    if(legInfos&&legInfos[i])d+=' · <b>'+legInfos[i].km.toFixed(1)+' km · '+legInfos[i].min+' min</b>';
+    h+=`<div class="leg"><div class="num">${i+1}</div><div class="body"><div class="a">${esc(a)}</div><div class="d">${d}</div></div></div>`;
+  });
+  let dA=arrLbl;
+  if(legInfos&&legInfos[orderedStops.length])dA+=' · <b>'+legInfos[orderedStops.length].km.toFixed(1)+' km · '+legInfos[orderedStops.length].min+' min</b>';
+  h+=`<div class="leg"><div class="num terminus">A</div><div class="body"><div class="a">${esc(endAddr)}</div><div class="d">${dA}</div></div></div>`;
+  $('manifest').innerHTML=h;
+
+  const links=buildMapsLinks(navPoints);const mb=$('mapsButtons');mb.innerHTML='';
+  links.forEach((url,i)=>{
+    if(links.length>1){const lab=document.createElement('div');lab.className='seg-label';lab.textContent='Segment '+(i+1)+' / '+links.length;mb.appendChild(lab)}
+    const b=document.createElement('button');b.className=i===0?'btn-nav':'btn-maps';b.style.marginTop='10px';
+    b.textContent=links.length>1?'🧭 Lancer le segment '+(i+1):'🧭 Lancer la navigation dans Google Maps';
+    b.onclick=()=>window.open(url,'_blank');mb.appendChild(b);
+  });
+  $('resultNote').textContent=engine==='google'
+    ?(links.length>1?'Navigation par coordonnées GPS. Au-delà de 11 points, la tournée est découpée en segments qui s\'enchaînent.':'Navigation par coordonnées GPS — durées avec trafic en temps réel.')
+    :'Mode gratuit : ordre fiable, navigation exacte par Google Maps. Le trafic temps réel nécessite la clé Google (⚙).';
+  $('resultCard').scrollIntoView({behavior:'smooth'});
+}
+
+/* ═══════════════ SIGNIFICATIONS ═══════════════ */
+const VU=['Maison d\'habitation','Résidence','Immeuble d\'habitation','Autre'];
+const MODS=[
+  {k:'personne',l:'À personne'},
+  {k:'pm',l:'À personne morale'},
+  {k:'domelu',l:'À domicile élu'},
+  {k:'domicile',l:'À domicile'},
+  {k:'depot',l:'Dépôt étude'},
+  {k:'659',l:'PV 659 — recherches infructueuses'}
+];
+const PM=['Fondé de pouvoir','Personne habilitée à recevoir l\'acte','Représentant légal'];
+const DEP=['Nom sur boîte aux lettres','Nom sur sonnette','Nom sur interphone','Confirmation du voisinage','Confirmation mairie','Statuts de la société','Pappers — siège social'];
+let selVu='',selMod='',selPM='',selDep=[];
+
+function chipGrid(el,items,getSel,onPick,gold){
+  el.innerHTML='';
+  items.forEach(it=>{
+    const lab=typeof it==='string'?it:it.l, val=typeof it==='string'?it:it.k;
+    const b=document.createElement('button');b.type='button';b.className='optchip';b.textContent=lab;
+    if(getSel(val))b.classList.add(gold?'selGold':'sel');
+    b.onclick=()=>{onPick(val)};
+    el.appendChild(b);
+  });
+}
+function refreshSigChips(){
+  chipGrid($('vuGrid'),VU,v=>selVu===v,v=>{selVu=v;refreshSigChips()});
+  $('sVuAutre').classList.toggle('hidden',selVu!=='Autre');
+  chipGrid($('modGrid'),MODS,v=>selMod===v,v=>{selMod=v;refreshSigChips()});
+  $('boxPM').classList.toggle('hidden',selMod!=='pm');
+  $('boxDom').classList.toggle('hidden',selMod!=='domicile');
+  $('boxDepot').classList.toggle('hidden',selMod!=='depot');
+  $('box659').classList.toggle('hidden',selMod!=='659');
+  chipGrid($('pmGrid'),PM,v=>selPM===v,v=>{selPM=v;refreshSigChips()});
+  chipGrid($('depGrid'),DEP,v=>selDep.includes(v),v=>{selDep=selDep.includes(v)?selDep.filter(x=>x!==v):[...selDep,v];refreshSigChips()},true);
+}
+$('sDomQual').addEventListener('change',()=>$('sDomQualAutre').classList.toggle('hidden',$('sDomQual').value!=='Autre'));
+$('sEncOn').addEventListener('change',()=>$('boxEnc').classList.toggle('hidden',!$('sEncOn').checked));
+$('sEchOn').addEventListener('change',()=>$('boxEch').classList.toggle('hidden',!$('sEchOn').checked));
+
+function nowLocal(){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)}
+function openSigForm(id,prefillAddr){
+  editingSigId=id;
+  const s=id?sigs.find(x=>x.id===id):null;
+  $('sigTitle').textContent=s?('Signification — dossier '+(s.dossier||'')):'Nouvelle signification';
+  $('btnSigDelete').style.display=s?'':'none';
+  $('sDossier').value=s?s.dossier:'';
+  $('sDate').value=s?s.date:nowLocal();
+  $('sNom').value=s?s.nom:''; $('sPrenom').value=s?s.prenom:'';
+  $('sAdresse').value=s?s.adresse:(prefillAddr||'');
+  selVu=s?s.vu:''; $('sVuAutre').value=s?s.vuAutre||'':'';
+  selMod=s?s.modalite:''; selPM=s?s.pmQui||'':'';
+  $('sDomIdent').value=s?s.domIdent||'':''; $('sDomQual').value=s?s.domQual||'':'';
+  $('sDomQualAutre').value=s?s.domQualAutre||'':'';
+  $('sDomQualAutre').classList.toggle('hidden',($('sDomQual').value!=='Autre'));
+  selDep=s?[...(s.depCaract||[])]:[]; $('sDepotManuel').value=s?s.depManuel||'':'';
+  $('sRem659').value=s?s.rem659||'':'';
+  $('sFActe').value=s&&s.fActe!=null?s.fActe:''; $('sFCopie').value=s&&s.fCopie!=null?s.fCopie:'';
+  $('sEncOn').checked=!!(s&&s.enc); $('boxEnc').classList.toggle('hidden',!$('sEncOn').checked);
+  $('sEncMontant').value=s&&s.enc?s.enc.montant:''; $('sEncMode').value=s&&s.enc?s.enc.mode:'Espèces';
+  $('sEchOn').checked=!!(s&&s.ech); $('boxEch').classList.toggle('hidden',!$('sEchOn').checked);
+  $('sEchFreq').value=s&&s.ech?s.ech.freq:'Mensuelle'; $('sEchMontant').value=s&&s.ech?s.ech.montant:'';
+  sigPhotos=s?[...(s.photos||[])]:[];
+  refreshSigChips(); renderPhotos();
+  $('sigStatus').className='status';
+  open2('sheetSig','veilSig');
+}
+$('btnNewSig').onclick=()=>openSigForm(null);
+$('btnSigCancel').onclick=()=>close2('sheetSig','veilSig');
+$('btnSigDelete').onclick=()=>{
+  if(editingSigId&&confirm('Supprimer cette signification ?')){
+    sigs=sigs.filter(s=>s.id!==editingSigId);saveState();renderSigs();close2('sheetSig','veilSig');
+  }};
+$('btnSigSave').onclick=()=>{
+  const st=$('sigStatus');
+  if(!$('sDossier').value.trim()){st.className='status err';st.textContent='Renseigne le n° de dossier.';return}
+  if(!selMod){st.className='status err';st.textContent='Sélectionne la modalité de signification.';return}
+  const data={
+    id:editingSigId||('sig'+Date.now()),
+    dossier:$('sDossier').value.trim(),date:$('sDate').value,
+    nom:$('sNom').value.trim(),prenom:$('sPrenom').value.trim(),adresse:$('sAdresse').value.trim(),
+    vu:selVu,vuAutre:$('sVuAutre').value.trim(),
+    modalite:selMod,pmQui:selPM,
+    domIdent:$('sDomIdent').value.trim(),domQual:$('sDomQual').value,domQualAutre:$('sDomQualAutre').value.trim(),
+    depCaract:selDep,depManuel:$('sDepotManuel').value.trim(),
+    rem659:$('sRem659').value.trim(),
+    fActe:$('sFActe').value?+$('sFActe').value:null,fCopie:$('sFCopie').value?+$('sFCopie').value:null,
+    enc:$('sEncOn').checked?{montant:$('sEncMontant').value,mode:$('sEncMode').value}:null,
+    ech:$('sEchOn').checked?{freq:$('sEchFreq').value,montant:$('sEchMontant').value}:null,
+    photos:sigPhotos
+  };
+  if(editingSigId){sigs=sigs.map(s=>s.id===editingSigId?data:s)}else sigs.unshift(data);
+  try{saveState()}catch(e){}
+  renderSigs(); close2('sheetSig','veilSig'); showView('s');
+};
+function modLabel(k){const m=MODS.find(x=>x.k===k);return m?m.l:k}
+function renderSigs(){
+  $('sigCount').textContent=sigs.length;
+  const l=$('sigList');
+  if(!sigs.length){l.innerHTML='<div class="empty"><span class="big">⚖</span>Aucune signification enregistrée.</div>';return}
+  l.innerHTML=sigs.map(s=>{
+    const d=s.date?new Date(s.date):null;
+    const dstr=d?d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';
+    return `<div class="sigItem" data-id="${s.id}">
+      <div class="l1"><span class="dos">${esc(s.dossier)}</span>
+        <span class="badge ${s.modalite==='659'?'b659':''}">${esc(modLabel(s.modalite))}</span></div>
+      <div class="l2">${esc((s.nom+' '+s.prenom).trim())}${s.adresse?' — '+esc(s.adresse):''}</div>
+      <div class="l3"><span>📅 ${dstr}</span>${s.photos&&s.photos.length?`<span>📷 ${s.photos.length}</span>`:''}${s.enc?`<span>💶 ${esc(s.enc.montant)} €</span>`:''}${s.ech?`<span>📆 échéancier</span>`:''}</div>
+    </div>`;
+  }).join('');
+  l.querySelectorAll('.sigItem').forEach(el=>el.onclick=()=>openSigForm(el.dataset.id));
+}
+
+/* photos */
+$('btnAddPh').onclick=()=>$('phInput').click();
+$('phInput').onchange=async e=>{
+  for(const f of [...e.target.files]){
+    if(sigPhotos.length>=6){alert('6 photos maximum par signification.');break}
+    sigPhotos.push(await compressImg(f));
+  }
+  renderPhotos(); e.target.value='';
+};
+function compressImg(file){
+  return new Promise((res,rej)=>{
+    const img=new Image();
+    img.onload=()=>{
+      const M=900,sc=Math.min(1,M/Math.max(img.width,img.height));
+      const c=document.createElement('canvas');c.width=img.width*sc;c.height=img.height*sc;
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      res(c.toDataURL('image/jpeg',.55));
+    };
+    img.onerror=()=>rej(new Error('image illisible'));
+    img.src=URL.createObjectURL(file);
+  });
+}
+function renderPhotos(){
+  const g=$('phGrid');
+  g.querySelectorAll('.ph').forEach(n=>n.remove());
+  sigPhotos.forEach((p,i)=>{
+    const d=document.createElement('div');d.className='ph';
+    d.innerHTML=`<img src="${p}" alt="photo ${i+1}"><button class="x" data-i="${i}">✕</button>`;
+    d.querySelector('.x').onclick=()=>{sigPhotos.splice(i,1);renderPhotos()};
+    g.insertBefore(d,$('btnAddPh'));
+  });
+}
+
+/* ═══════════════ COMMANDE VOCALE ═══════════════ */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let rec=null,recActive=false,audioCtx=null,analyser=null,micStream=null,rafId=null;
+function speak(txt){return new Promise(res=>{
+  let done=false;const end=()=>{if(!done){done=true;res()}};
+  try{
+    speechSynthesis.cancel();      /* purge une éventuelle file bloquée (bug Chrome après cancel) */
+    speechSynthesis.resume();      /* réveille le moteur s'il est resté en pause */
+    const u=new SpeechSynthesisUtterance(txt);u.lang='fr-FR';u.rate=1.02;u.onend=end;u.onerror=end;
+    speechSynthesis.speak(u);
+    setTimeout(end,Math.min(1500+txt.length*90,8000)); /* garde-fou : la promesse se résout toujours */
+  }catch(e){end()}
+})}
+/* voix d'instructions jouée uniquement à la toute première utilisation (par mode) */
+const introDone=m=>localStorage.getItem('vIntro_'+m)==='1';
+const markIntro=m=>localStorage.setItem('vIntro_'+m,'1');
+async function speakIntroOnce(mode,txt){if(!introDone(mode)){await speak(txt);markIntro(mode)}}
+const norm=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+
+async function startOrbAudio(){
+  try{
+    micStream=await navigator.mediaDevices.getUserMedia({audio:true});
+    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    analyser=audioCtx.createAnalyser();analyser.fftSize=256;
+    audioCtx.createMediaStreamSource(micStream).connect(analyser);
+    const data=new Uint8Array(analyser.frequencyBinCount);
+    const orb=$('orb');
+    const loop=()=>{analyser.getByteFrequencyData(data);
+      let v=0;for(let i=0;i<data.length;i++)v+=data[i];v/=data.length;
+      orb.style.transform='scale('+(1+Math.min(v/110,.55))+')';
+      rafId=requestAnimationFrame(loop)};
+    loop();
+  }catch(e){/* visualisation indisponible : l'orbe pulse via CSS */}
+}
+function stopOrbAudio(){
+  if(rafId)cancelAnimationFrame(rafId);rafId=null;
+  if(micStream){micStream.getTracks().forEach(t=>t.stop());micStream=null}
+  if(audioCtx){audioCtx.close().catch(()=>{});audioCtx=null}
+  $('orb').style.transform='';
+}
+function stopVoice(){
+  recActive=false;
+  $('vDictee').classList.add('hidden');
+  if(rec){rec.onresult=null;rec.onend=null;rec.onerror=null;try{rec.abort()}catch(e){}rec=null}
+  stopOrbAudio();
+  $('voiceOverlay').classList.remove('on');
+  speechSynthesis.cancel();
+}
+$('vStop').onclick=stopVoice;
+$('vDictee').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    const t=$('vDictee').value.trim();
+    if(t){$('vTxt').textContent=t;handleVoice(t,vMode);$('vDictee').value='';}
+  }
+});
+
+let vMode='adresse';
+$('btnMic').onclick=async()=>{
+  const sigOpen=$('sheetSig').classList.contains('open');
+  const mode=sigOpen?'signif':'adresse'; vMode=mode;
+  if(!SR){ /* Mode secours : dictée du clavier (iPhone/Chrome iOS) */
+    $('voiceOverlay').classList.add('on');
+    $('vTxt').textContent='Dictée via le clavier';
+    $('vHint').textContent=mode==='adresse'
+      ?'Touche le champ, appuie sur le 🎤 du clavier, dicte « 12 rue des Fleurs, 68000 Colmar », puis Entrée.'
+      :'Touche le champ, appuie sur le 🎤 du clavier, dicte « dépôt étude », « nom sur boîte aux lettres »…, puis Entrée.';
+    const f=$('vDictee'); f.classList.remove('hidden'); f.value='';
+    startOrbAudio();
+    await speakIntroOnce(mode,mode==='adresse'?'Renseignez la nouvelle adresse.':'Renseignez les modalités de signification.');
+    setTimeout(()=>f.focus(),150);
+    return;
+  }
+  $('vDictee').classList.add('hidden');
+  $('voiceOverlay').classList.add('on');
+  $('vTxt').textContent='…';
+  $('vHint').textContent=mode==='adresse'
+    ?'Ex. : « 12 rue des Fleurs, 68000 Colmar »'
+    :'Ex. : « dépôt étude », « nom sur boîte aux lettres », « à personne », ou dictez dans le champ sélectionné';
+  await speakIntroOnce(mode,mode==='adresse'
+    ?'Renseignez la nouvelle adresse : numéro, voie, code postal et ville.'
+    :'Renseignez les modalités de signification, ou dictez le contenu du champ sélectionné.');
+  if(!$('voiceOverlay').classList.contains('on'))return;
+  startOrbAudio();
+  recActive=true;
+  startRec(mode);
+};
+
+/* démarre (ou redémarre) la reconnaissance sur une instance NEUVE — la réutilisation
+   d'une même instance SpeechRecognition après onend est peu fiable (Chrome/Android) */
+function startRec(mode){
+  if(rec){rec.onresult=null;rec.onend=null;rec.onerror=null;try{rec.abort()}catch(e){}}
+  rec=new SR();rec.lang='fr-FR';rec.interimResults=true;rec.continuous=true;
+  rec.onresult=e=>{
+    let interim='',final='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const t=e.results[i][0].transcript;
+      if(e.results[i].isFinal)final+=t;else interim+=t;
+    }
+    $('vTxt').textContent=interim||final||'…';
+    if(final)handleVoice(final,mode);
+  };
+  rec.onend=()=>{if(recActive)setTimeout(()=>{if(recActive)startRec(mode)},150)};
+  rec.onerror=ev=>{
+    if(ev.error==='not-allowed'){$('vTxt').textContent='Micro refusé — autorise-le dans le navigateur.';recActive=false}
+  };
+  try{rec.start()}catch(e){}
+}
+
+/* registre de mots-clés (signification) */
+const KW=[
+  {k:['a personne','remise a personne'],f:()=>{selMod='personne';refreshSigChips()}},
+  {k:['personne morale'],f:()=>{selMod='pm';refreshSigChips()}},
+  {k:['fonde de pouvoir'],f:()=>{selMod='pm';selPM='Fondé de pouvoir';refreshSigChips()}},
+  {k:['personne habilitee'],f:()=>{selMod='pm';selPM='Personne habilitée à recevoir l\'acte';refreshSigChips()}},
+  {k:['representant legal'],f:()=>{selMod='pm';selPM='Représentant légal';refreshSigChips()}},
+  {k:['domicile elu'],f:()=>{selMod='domelu';refreshSigChips()}},
+  {k:['a domicile','remise a domicile'],f:()=>{selMod='domicile';refreshSigChips()}},
+  {k:['depot etude','depot a l etude'],f:()=>{selMod='depot';refreshSigChips()}},
+  {k:['659','six cent cinquante neuf','recherches infructueuses','proces verbal 659'],f:()=>{selMod='659';refreshSigChips()}},
+  {k:['nom sur boite aux lettres','boite aux lettres'],f:()=>{selMod='depot';if(!selDep.includes(DEP[0]))selDep.push(DEP[0]);refreshSigChips()}},
+  {k:['nom sur sonnette','sonnette'],f:()=>{selMod='depot';if(!selDep.includes(DEP[1]))selDep.push(DEP[1]);refreshSigChips()}},
+  {k:['interphone'],f:()=>{selMod='depot';if(!selDep.includes(DEP[2]))selDep.push(DEP[2]);refreshSigChips()}},
+  {k:['voisinage','voisin confirme'],f:()=>{selMod='depot';if(!selDep.includes(DEP[3]))selDep.push(DEP[3]);refreshSigChips()}},
+  {k:['mairie'],f:()=>{selMod='depot';if(!selDep.includes(DEP[4]))selDep.push(DEP[4]);refreshSigChips()}},
+  {k:['statuts de la societe','statuts'],f:()=>{selMod='depot';if(!selDep.includes(DEP[5]))selDep.push(DEP[5]);refreshSigChips()}},
+  {k:['pappers','siege social'],f:()=>{selMod='depot';if(!selDep.includes(DEP[6]))selDep.push(DEP[6]);refreshSigChips()}},
+  {k:['maison d habitation','maison'],f:()=>{selVu='Maison d\'habitation';refreshSigChips()}},
+  {k:['residence'],f:()=>{selVu='Résidence';refreshSigChips()}},
+  {k:['immeuble d habitation','immeuble'],f:()=>{selVu='Immeuble d\'habitation';refreshSigChips()}},
+  {k:['encaissement'],f:()=>{$('sEncOn').checked=true;$('boxEnc').classList.remove('hidden')}},
+  {k:['echeancier'],f:()=>{$('sEchOn').checked=true;$('boxEch').classList.remove('hidden')}}
+];
+let lastField=null;
+document.addEventListener('focusin',e=>{
+  if($('sheetSig').contains(e.target)&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))lastField=e.target;
+});
+function handleVoice(txt,mode){
+  const n=norm(txt);
+  if(mode==='adresse'){parseSpokenAddress(txt);return}
+  for(const kw of KW){if(kw.k.some(x=>n.includes(x))){kw.f();speak('C\'est noté.');return}}
+  if(lastField&&!lastField.classList.contains('hidden')){
+    lastField.value=(lastField.value?lastField.value+' ':'')+txt.trim();
+  }else speak('Sélectionnez un champ, ou dictez une modalité.');
+}
+function parseSpokenAddress(txt){
+  const cp=(txt.match(/\b(\d{5})\b/)||[])[1]||'';
+  let rest=txt, num='';
+  const mNum=rest.match(/^\s*(\d+\s?(?:bis|ter)?)\b/i);
+  if(mNum){num=mNum[1].trim();rest=rest.slice(mNum[0].length)}
+  let voie=rest, ville='';
+  if(cp){const i=rest.indexOf(cp);voie=rest.slice(0,i);ville=rest.slice(i+cp.length)}
+  voie=voie.replace(/[,;]/g,' ').replace(/\s+/g,' ').trim();
+  ville=ville.replace(/[,;]/g,' ').replace(/\s+/g,' ').trim();
+  if(!$('sheetAddr').classList.contains('open'))open2('sheetAddr','veilAddr');
+  if(num)$('aNum').value=num;
+  if(voie)$('aVoie').value=voie;
+  if(cp)$('aCP').value=cp;
+  if(ville)$('aVille').value=ville.charAt(0).toUpperCase()+ville.slice(1);
+  speak(cp&&voie?'Adresse renseignée. Vérifiez puis validez.':'Je n\'ai pas tout compris. Complétez les champs manquants.');
+}
+
+/* ═══════════════ SPLASH ═══════════════ */
+(function(){
+  const sp=$('splash');
+  const hide=()=>{sp.classList.add('done');setTimeout(()=>sp.remove(),650)};
+  sp.addEventListener('click',hide);
+  setTimeout(hide,2700);
+})();
+
+/* ═══════════════ INIT ═══════════════ */
+$('startAddr').addEventListener('change',saveState);
+$('endAddr').addEventListener('change',saveState);
+loadState();
+</script>
+</body>
+</html>
